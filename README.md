@@ -12,6 +12,7 @@ HUDDLE 第3回例会
 最初の質問 [あなたは"AI"を使ったことがありますか？](https://strawpoll.com/xVg7160VGyr)  
 
 チューリングテスト再現[どちらがラクラミのツイート？](https://strawpoll.com/e2naXlDreyB)  
+あとでリンクはる
 
 chatGPTインストール[iPhone](https://apps.apple.com/jp/app/chatgpt/id6448311069)  
 [Android](https://play.google.com/store/apps/details?id=com.openai.chatgpt&pcampaignid=web_share&pli=1)  
