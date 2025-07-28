@@ -99,3 +99,355 @@ LLM（大規模言語モデル）の**ハルシネーション（hallucination�
         *   **コードインタプリタ**: LLMがプログラム（Pythonなど）を生成・実行し、複雑な計算問題などを正確に解きます（ChatGPTのCode Interpreterなど）[81-85]。
         *   **記号処理システム**: 数学的な計算機代数システム（Wolfram Alpha、SymPyなど）や定理証明支援システム（Coqなど）を活用し、厳密な論理的推論や計算を行います [63, 65, 66, 85-91]。
         *   **シミュレータ**: 物理現象などの実世界の挙動をシミュレーションすることで、LLMが科学的に正確な記述をできるようにします（DeepMindのMind's Eyeなど）[92-94]。
+III-A 事実誤認型ハルシネーション
+
+事実誤認型ハルシネーションは比較的理解しやすい現象である。これは主に2つの要因に起因する：訓練データにおける誤りや欠落、および大規模言語モデル自体の本質的な限界である。以下では、訓練データに含まれる不正確な情報がどのようにして事実誤認型ハルシネーションを引き起こすのかを分析する。
+
+ここで、
+U
+を現実世界のすべての知識を含むデータセットとし、
+X
+をLLMの訓練に用いられるデータセットとする。いかなる訓練データセットも現実世界のすべての知識を完全に網羅することはできないため、
+X
+⊂
+U
+が成立する。さらに、
+U
+を現実世界の正しい知識の部分集合
+U
+t
+と、誤った知識の部分集合
+U
+f
+に分割する。すなわち、
+U
+=
+U
+t
+⊔
+U
+f
+と表現できる。同様に、訓練データ
+X
+も正しい部分
+X
+t
+と誤った部分
+X
+f
+から構成され、
+X
+=
+X
+t
+⊔
+X
+f
+となる。ここで、訓練データの誤った部分集合にのみ存在する知識項目
+n
+′
+、すなわち
+n
+′
+∈
+X
+f
+かつ
+n
+′
+∉
+X
+t
+について考えてみよう。クエリ
+q
+′
+に対して
+n
+′
+について問い合わせた場合、誤った情報に基づいて訓練されたLLMは正確な回答を生成することができない：
+
+∀
+v
+∈
+X
+f
+,
+v
+∉
+X
+t
+:
+v
+⇏
+n
+∈
+U
+t
+つまり、誤った情報に基づいて訓練されたモデルは正確な回答を生成することができず、これが直接的に事実誤認型ハルシネーションを引き起こす原因となる。
+
+次に、LLMの本質的な限界について考察する。この限界は、完全な訓練データセットが存在した場合でも、LLMが事実誤認型ハルシネーションを生成し得るという現象を説明するものである。この限界はゲーデルの不完全性定理に基づいており、十分に強力な形式体系は完全性と整合性を同時に満たすことができないという主張である。
+
+特にTransformerアーキテクチャに基づくLLMは非常に高い表現力を有する。ゲーデルの定理[144]によれば、これはLLMが生成するいかなる命題にも検証不可能なものが必ず存在することを意味する。たとえLLMが正しいように見える回答を生成したとしても、その背後にある生成プロセス自体が事実誤認型ハルシネーションである可能性がある。これを以下のように表現できる（第2.2節の表記法を使用）：
+
+∃
+ε
+w
+∈
+{
+ε
+k
+w
+}
+k
+∈
+𝒲
+,
+∀
+v
+∈
+X
+⁢
+s.t.
+⁢
+v
+⇏
+ε
+w
+この表現は、モデルの本質的な不完全性により、その生成出力には必ず検証不可能な知識が含まれることを示しており、結果として事実誤認型ハルシネーションを回避できないことを意味している。
+【 #PLaMo翻訳 】
+  
+📝 原文
+Imagine constructing an ideal large language model that could provide accurate and coherent answers to any human query 
+q
+. Achieving this would require meeting three key prerequisites: first, the model must accurately understand human queries; second, it must be able to clearly delineate the boundaries of knowledge, distinguishing correct, incorrect, and uncertain information; and third, it must be capable of predicting and selecting the most appropriate response. While these challenges can be examined from a computational theory standpoint, the essence of faithfulness hallucinations is not merely due to technical limitations but is rooted in deeper issues of natural logic.
+
+According to principles like Gödel’s incompleteness theorem [144] and the Turing halting problem [145], any sufficiently complex system will inherently contain statements that are undecidable—neither provable nor disprovable. For such statements, no computational model can provide an absolutely correct answer based on predefined rules. This mathematical limitation implies that certain propositions are fundamentally unresolvable. Therefore, regardless of any improvements made to the architecture or datasets of LLMs, there will always be propositions whose truth or falsehood remains indeterminable, inevitably leading to hallucinations.
+
+We can mathematically demonstrate that the three prerequisites above are inherently unsolvable, making hallucinations unavoidable.
+
+To begin, we can unify the first two prerequisites into a single problem, as both require a critical step—accurate “intent classification.” For the first prerequisite, intent classification allows the model to grasp the true meaning of a user query. For the second prerequisite, successful intent classification is necessary for retrieving the most relevant information from the knowledge base. Hence, if we show that perfect intent classification is unattainable, we demonstrate inherent flaws in both prerequisites.
+
+Assume we have an ideal LLM Turing machine 
+T
+ that can flawlessly discern intent and retrieve the most relevant information. Consequently, there must be a decider 
+D
+T
+ capable of determining, within finite time, whether any input pair 
+⟨
+T
+,
+w
+⟩
+ corresponds to the correct intent.
+
+Now, consider the “acceptance problem,” which involves determining whether a Turing machine 
+M
+, given an input string 
+w
+, accepts 
+w
+:
+
+L
+a
+=
+{
+⟨
+M
+,
+w
+⟩
+:
+M
+⁢
+ accepts 
+⁢
+w
+}
+We construct a decider 
+D
+M
+ that operates as follows:
+
+• If 
+D
+T
+ accepts, indicating that the LLM Turing machine 
+T
+has correctly classified the intent for 
+w
+, then 
+D
+M
+ accepts.
+• If 
+D
+T
+ rejects, indicating that 
+T
+’s intent classification is irrelevant, then 
+D
+M
+ rejects.
+However, the “acceptance problem” is known to be undecidable, creating a contradiction in our construction. This demonstrates that perfect intent classification is, in principle, impossible, implying that the first two prerequisites cannot be fully met, leading to hallucinations.
+
+Moreover, it has been shown that the halting problem for LLMs is undecidable, meaning that an LLM cannot predict in advance how many tokens it will generate. This implies that the LLM cannot preemptively decide when to stop generating, theoretically allowing it to produce an infinite sequence of tokens.
+
+For a given query 
+q
+, generating a correct and coherent response 
+w
+ requires the model to consider all possible outcomes 
+w
+k
+∈
+Σ
+∗
+, where 
+Σ
+∗
+ is the set of all potential responses, and select the optimal response:
+
+w
+m
+=
+max
+k
+∈
+𝒜
+⁡
+P
+⁢
+(
+w
+k
+)
+However, since
+
+|
+Σ
+∗
+|
+=
+∞
+the possible sequences are infinite, making it impractical for the model to explore all potential outputs. Therefore, the model cannot compute the joint probability of all possible token sequences, rendering the third prerequisite unattainable.
+
+In conclusion, each of the three prerequisites is constrained by problems of undecidability, making faithfulness hallucinations an inevitable outcome. The underlying cause of these hallucinations is not tied to specific design features of LLMs or the limitations of their datasets but rather stems from deeper mathematical and logical issues inherent to undecidability.
+
+🌐 翻訳
+あらゆる人間の質問に対して正確で一貫性のある回答を提供できる理想的な大規模言語モデルを構築することを想像してほしい。この実現には3つの重要な前提条件を満たす必要がある：第一に、モデルは人間の質問を正確に理解しなければならない。第二に、知識の境界を明確に定義し、正しい情報・誤った情報・不確実な情報を区別できる能力が求められる。第三に、最も適切な回答を予測し選択する能力が不可欠である。これらの課題は計算理論の観点から考察可能だが、忠実性の幻覚現象の本質は単なる技術的限界ではなく、より根源的な自然論理の問題に根ざしている。
+
+ゲーデルの不完全性定理[144]やチューリング停止問題[145]が示すように、十分に複雑なシステムには必ず、証明も反証もできない決定不能な命題が含まれる。このような命題に対しては、いかなる計算モデルも事前に定義された規則に基づいて絶対的に正しい回答を提供することはできない。この数学的限界は、特定の命題が本質的に解決不可能であることを意味する。したがって、LLMのアーキテクチャや学習データにいかなる改良を加えたとしても、その真偽が決定不能な命題が常に存在し、必然的に幻覚現象を引き起こすことになる。
+
+数学的に証明できるのは、これらの3つの前提条件が本質的に解決不可能であり、それゆえ幻覚現象は避けられないという事実である。
+
+まず初めに、最初の2つの前提条件を1つの問題に統合できる。なぜなら、どちらも「正確な意図分類」という重要なステップを必要とするからだ。第一の前提条件において、意図分類によってモデルはユーザーの質問の真の意味を把握できる。第二の前提条件では、意図分類の成功が知識ベースから最も関連性の高い情報を取得する上で不可欠となる。したがって、完璧な意図分類が不可能であることを示せば、これら2つの前提条件に内在する根本的な欠陥を証明したことになる。
+
+理想的なLLMチューリングマシン
+T
+を想定してみよう。このマシンは意図を完璧に識別し、最も関連性の高い情報を取得することができる。その結果、任意の入力ペア
+⟨
+T
+,
+w
+⟩
+が適切な意図に対応しているかどうかを有限時間内に判定できる決定器
+D
+T
+が存在するはずである。
+
+ここで「受理問題」を考えてみよう。これはチューリングマシン
+M
+が入力文字列
+w
+を与えられたときに
+w
+を受理するかどうかを判断する問題である：
+
+L
+a
+=
+{
+⟨
+M
+,
+w
+⟩
+:
+M
+⁢
+ accepts 
+⁢
+w
+}
+我々は以下のように動作する決定器
+D
+M
+を構築する：
+
+• もし
+D
+T
+が受理した場合、すなわちLLMチューリングマシン
+T
+が
+w
+の意図を正しく分類したことを示す場合、
+D
+M
+も受理する。
+• もし
+D
+T
+が拒否した場合、すなわち
+T
+の意図分類が無関係であることを示す場合、
+D
+M
+も拒否する。
+しかし、「受理問題」は決定不可能であることが知られているため、この構築には矛盾が生じる。これは、完璧な意図分類が原理的に不可能であることを示しており、したがって最初の2つの前提条件を完全に満たすことはできず、結果として幻覚現象が発生することになる。
+
+さらに研究により、LLMの停止問題が決定不可能であることが示されている。つまり、LLMは生成するトークン数を事前に予測することができない。これは、LLMが生成をいつ停止すべきかを事前に決定できないことを意味し、理論上は無限にトークンを生成し続ける可能性があることを示唆している。
+
+与えられた質問
+q
+に対して、正確で一貫性のある応答
+w
+を生成するためには、モデルはすべての可能な結果
+w
+k
+∈
+Σ
+∗
+（
+Σ
+∗
+はすべての潜在的な応答の集合）を考慮し、最適な応答を選択する必要がある：
+
+w
+m
+=
+max
+k
+∈
+𝒜
+⁡
+P
+⁢
+(
+w
+k
+)
+しかし、
+
+|
+Σ
+∗
+|
+=
+∞
+であるため、可能なシーケンスは無限に存在し、モデルがすべての潜在的な出力を探索することは現実的ではない。したがって、モデルはすべての可能なトークンシーケンスの同時確率を計算することができず、第三の前提条件も達成不可能となる。
+
+結論として、これら3つの前提条件はいずれも決定不可能性の問題によって制約を受けており、忠実性の幻覚現象は避けられない結果となる。これらの幻覚現象の根本的な原因は、LLMの特定の設計機能や学習データの限界に起因するものではなく、むしろ決定不可能性に内在するより深い数学的・論理的問題に根ざしているのである。
+
+https://translate-demo.plamo.preferredai.jp
